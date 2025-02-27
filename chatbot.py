@@ -11,8 +11,8 @@ from langchain.agents import Tool
 # import asyncio
 
 
-os.environ["GROQ_API_KEY"] = "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"
-os.environ["TAVILY_API_KEY"] = "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"
+os.environ["GROQ_API_KEY"] = "your key here"
+os.environ["TAVILY_API_KEY"] = "your key here"
 
 llm = init_chat_model("llama3-70b-8192", model_provider="groq")
 
