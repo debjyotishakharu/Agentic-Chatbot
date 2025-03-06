@@ -5,14 +5,16 @@ from langgraph.prebuilt import create_react_agent
 from langgraph.checkpoint.memory import MemorySaver
 from langchain_core.messages import HumanMessage
 from langchain.chains import ConversationalRetrievalChain
+from langchain_community.tools import WikipediaQueryRun
+from langchain_community.utilities import WikipediaAPIWrapper
 from langchain.memory import ConversationBufferMemory
 from langchain.tools import tool
 from langchain.agents import Tool
+import datetime
 # import asyncio
 
-
-os.environ["GROQ_API_KEY"] = "your key here"
-os.environ["TAVILY_API_KEY"] = "your key here"
+os.environ["GROQ_API_KEY"] = "Your_key_here"
+os.environ["TAVILY_API_KEY"] = "Your_key_here"
 
 llm = init_chat_model("llama3-70b-8192", model_provider="groq")
 
@@ -37,18 +39,46 @@ def calculator(expression: str) -> str:
     except Exception as e:
         return f"Error evaluating expression: {str(e)}"
     
+# Define a very simple tool function that returns the current time
+def get_current_time(*args, **kwargs):
+    """Returns the current time in H:MM AM/PM format."""
+    import datetime  # Import datetime module to get current time
+
+    now = datetime.datetime.now()  # Get current time
+    return now.strftime("%I:%M %p")  # Format time in H:MM AM/PM format
+
+def get_current_date(*args, **kwargs):
+    """Returns the current date in YYYY-MM-DD format."""
+    return datetime.datetime.now().strftime("%Y-%m-%d")
+    
 tools = [
-            Tool(
-                name="Web Search",
-                func=search_tool.invoke,
-                description="Useful for retrieving the latest information from the web."
-            ),
-            Tool(
-                name="Calculator",
-                func=calculator,
-                description="Useful for performing mathematical calculations."
-            )
-        ]
+    Tool(
+        name="Web Search",
+        func=search_tool.invoke,
+        description="Useful for retrieving the latest information from the web.",
+    ),
+    Tool(
+        name="Calculator",
+        func=calculator,
+        description="Useful for performing mathematical calculations.",
+    ),
+    Tool(
+        name="Time",  # Name of the tool
+        func=get_current_time,  # Function that the tool will execute
+        # Description of the tool
+        description="Useful for when you need to know the current time",
+    ),
+    Tool(
+        name="Wikipedia",
+        func=WikipediaQueryRun(api_wrapper=WikipediaAPIWrapper()).run,
+        description="Fetches information from Wikipedia.",
+    ),
+    Tool(
+        name="Current Date",
+        func=get_current_date,
+        description="Provides the current date in YYYY-MM-DD format.",
+    ),
+]
 
 memory = MemorySaver()
 
