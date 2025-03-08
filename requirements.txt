@@ -1,5 +1,11 @@
 langgraph
+fastapi
+uvicorn
+python-multipart
 tavily-python
 langchain-groq
 langchain-community
 langchain
+SpeechRecognition
+pyttsx3
+wikipedia
